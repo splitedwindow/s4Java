@@ -85,8 +85,20 @@ public class ApiControllers {
             }
         } else if (customerOpt.isPresent())
         {
+
+            // chef if it's order of current user
             if(orderOpt.isPresent())
             {
+                Customer customer = customerOpt.get();
+                long userId = customer.getUserId();
+                Orders order = orderOpt.get();
+                long orderUserId = order.getUserId();
+
+                if(userId != orderUserId)
+                {
+                    return "It's order of different user.";
+                }
+
                 ordersR.deleteById(orderId);
                 return "Order canceled";
             } else {
