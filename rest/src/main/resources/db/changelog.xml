@@ -1,6 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<databaseChangeLog>
 
-</beans>
+    <!-- Таблиця Chefs -->
+    <changeSet id="1" author="author">
+        <createTable tableName="chef">
+            <column name="chefId" type="INT">
+                <constraints primaryKey="true" nullable="false" autoIncrement="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Таблиця Customers -->
+    <changeSet id="2" author="author">
+        <createTable tableName="customer">
+            <column name="customerId" type="INT">
+                <constraints primaryKey="true" nullable="false" autoIncrement="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Таблиця Dishes -->
+    <changeSet id="3" author="author">
+        <createTable tableName="dishes">
+            <column name="dishId" type="INT">
+                <constraints primaryKey="true" nullable="false" autoIncrement="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Таблиця Orders -->
+    <changeSet id="4" author="author">
+        <createTable tableName="orders">
+            <column name="orderId" type="INT">
+                <constraints primaryKey="true" nullable="false" autoIncrement="true"/>
+            </column>
+            <column name="customerId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dishId" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <addForeignKeyConstraint baseTableName="Orders" baseColumnNames="customerId"
+                                     constraintName="fk_customerId" referencedTableName="Customers"
+                                     referencedColumnNames="customerId"/>
+            <addForeignKeyConstraint baseTableName="Orders" baseColumnNames="dishId"
+                                     constraintName="fk_dishId" referencedTableName="Dishes"
+                                     referencedColumnNames="dishId"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
