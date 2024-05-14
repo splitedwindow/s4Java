@@ -1,6 +1,5 @@
 package com.roman.app.rest.Repo;
 
-import com.roman.app.rest.Models.Chef;
 import com.roman.app.rest.Models.chef_pass;
 import org.springframework.data.jpa.repository.JpaRepository;
 

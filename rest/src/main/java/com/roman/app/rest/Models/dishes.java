@@ -1,12 +1,11 @@
 package com.roman.app.rest.Models;
 
 import jakarta.persistence.*;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
 @Entity
-public class Dishes {
+public class dishes {
     @Id
     @GeneratedValue
     private long dishId;

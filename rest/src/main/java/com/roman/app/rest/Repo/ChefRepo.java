@@ -1,11 +1,10 @@
 package com.roman.app.rest.Repo;
 
-import com.roman.app.rest.Models.Chef;
+import com.roman.app.rest.Models.сhef;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
-public interface ChefRepo extends JpaRepository<Chef, Long> {
-    Optional<Chef> findByEmailAndPassword(String email, String password);
+public interface ChefRepo extends JpaRepository<сhef, Long> {
+    Optional<сhef> findByEmailAndPassword(String email, String password);
 }

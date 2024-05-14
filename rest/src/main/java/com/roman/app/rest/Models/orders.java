@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Entity
-public class Orders {
+public class orders {
     @Id
     @GeneratedValue
     private long orderId;

@@ -29,21 +29,21 @@ public class ApiControllers {
 
     // get all the chefs
     @GetMapping(value="/chefs")
-    public List<Chef> getChefs() {
+    public List<сhef> getChefs() {
         return chefR.findAll();
     }
 
 
     // get all the dishes
     @GetMapping(value="/dishes")
-    public List<Dishes> getDishes() {
+    public List<dishes> getDishes() {
         return dishesR.findAll();
     }
 
 //    crete new dish
     @PostMapping(value = "/dish")
-    public String saveDish(@RequestBody Dishes dish, @RequestParam String email,@RequestParam String password){
-        Optional<Chef> chefOpt = chefR.findByEmailAndPassword(email, password);
+    public String saveDish(@RequestBody dishes dish, @RequestParam String email, @RequestParam String password){
+        Optional<сhef> chefOpt = chefR.findByEmailAndPassword(email, password);
         if (chefOpt.isEmpty()) {
             return "Chef not found";
         }
@@ -53,7 +53,7 @@ public class ApiControllers {
 
     // create new chef
     @PostMapping(value="/chefregister")
-    public String saveChef(@RequestBody Chef chef, @RequestParam String password){
+    public String saveChef(@RequestBody сhef chef, @RequestParam String password){
         Optional<chef_pass> chef_passOptional = chef_passR.findByPassword(password);
         if(chef_passOptional.isEmpty())
         {
@@ -65,15 +65,15 @@ public class ApiControllers {
     }
 
     @GetMapping(value="/orders")
-    public List<Orders> getOrders() {
+    public List<orders> getOrders() {
         return ordersR.findAll();
     }
 
     @DeleteMapping("/order/delete/{orderId}")
     public String DeleteOrder(@PathVariable Long orderId, @RequestParam String password, @RequestParam String email) {
-        Optional<Chef> chefOpt = chefR.findByEmailAndPassword(email, password);
-        Optional<Customer> customerOpt = customerR.findByEmailAndPassword(email, password);
-        Optional<Orders> orderOpt = ordersR.findById(orderId);
+        Optional<сhef> chefOpt = chefR.findByEmailAndPassword(email, password);
+        Optional<customer> customerOpt = customerR.findByEmailAndPassword(email, password);
+        Optional<orders> orderOpt = ordersR.findById(orderId);
         if(chefOpt.isPresent())
         {
             if(orderOpt.isPresent())
@@ -89,9 +89,9 @@ public class ApiControllers {
             // chef if it's order of current user
             if(orderOpt.isPresent())
             {
-                Customer customer = customerOpt.get();
+                customer customer = customerOpt.get();
                 long userId = customer.getUserId();
-                Orders order = orderOpt.get();
+                orders order = orderOpt.get();
                 long orderUserId = order.getUserId();
 
                 if(userId != orderUserId)
@@ -111,29 +111,29 @@ public class ApiControllers {
 
     // get list of customers
     @GetMapping(value="/customers")
-    public List<Customer> getCustomers() {
+    public List<customer> getCustomers() {
         return customerR.findAll();
     }
 
     // create new customer
     @PostMapping(value="/register")
-    public String saveUser(@RequestBody Customer Customers){
+    public String saveUser(@RequestBody customer Customers){
         customerR.save(Customers);
         return "user registered";
     }
 
     // create new order with customer's login data
     @PostMapping(value="/order")
-    public String saveOrder(@RequestBody Orders order, @RequestParam String email, @RequestParam String password){
-        Optional<Dishes> dishOpt = dishesR.findById(order.getDishId());
-        Optional<Customer> customerOpt = customerR.findByEmailAndPassword(email, password);
+    public String saveOrder(@RequestBody orders order, @RequestParam String email, @RequestParam String password){
+        Optional<dishes> dishOpt = dishesR.findById(order.getDishId());
+        Optional<customer> customerOpt = customerR.findByEmailAndPassword(email, password);
         if(customerOpt.isEmpty()){
             return "Wrong email or password";
         } else if (dishOpt.isEmpty()) {
             return "Dish with chosen id doesn't exist";
         }
 
-        Customer customer = customerOpt.get();
+        customer customer = customerOpt.get();
         long userId = customer.getUserId();
 
         order.setUserId(userId);

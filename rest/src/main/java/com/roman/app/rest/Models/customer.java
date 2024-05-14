@@ -1,15 +1,22 @@
 package com.roman.app.rest.Models;
 
 import jakarta.persistence.*;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
 @Entity
-public class Chef {
+public class customer {
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
     @Id
     @GeneratedValue
-    private long chefId;
+    private long userId;
     public String getEmail() {
         return email;
     }
@@ -28,5 +35,6 @@ public class Chef {
 
     @Column
     private String email;
-    @Column String password;
+    @Column
+    private String password;
 }
