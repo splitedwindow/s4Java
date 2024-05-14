@@ -10,15 +10,25 @@ public class Orders {
     @GeneratedValue
     private long orderId;
 
-    public int getName() {
-        return dishId;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setName(int name) {
-        this.dishId = name;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     @Column
-    private int dishId;
+    private long userId;
 
+    public long getDishId() {
+        return dish_id;
+    }
+
+    public void setDishId(int id) {
+        this.dish_id = id;
+    }
+
+    @Column
+    private long dish_id;
 }

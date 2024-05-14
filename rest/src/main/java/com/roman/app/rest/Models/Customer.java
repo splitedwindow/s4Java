@@ -7,6 +7,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Entity
 public class Customer {
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
     @Id
     @GeneratedValue
     private long userId;

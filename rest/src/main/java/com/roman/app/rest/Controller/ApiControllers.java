@@ -1,9 +1,6 @@
 package com.roman.app.rest.Controller;
 
-import com.roman.app.rest.Models.Chef;
-import com.roman.app.rest.Models.Customer;
-import com.roman.app.rest.Models.Dishes;
-import com.roman.app.rest.Models.chef_pass;
+import com.roman.app.rest.Models.*;
 import com.roman.app.rest.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +18,7 @@ public class ApiControllers {
     @Autowired
     private dishesRepo dishesR;
     @Autowired
-    private ordersRepo orderR;
+    private ordersRepo ordersR;
     @Autowired
     private chef_passRepo chef_passR;
 
@@ -67,6 +64,39 @@ public class ApiControllers {
         }
     }
 
+    @GetMapping(value="/orders")
+    public List<Orders> getOrders() {
+        return ordersR.findAll();
+    }
+
+    @DeleteMapping("/order/delete/{orderId}")
+    public String DeleteOrder(@PathVariable Long orderId, @RequestParam String password, @RequestParam String email) {
+        Optional<Chef> chefOpt = chefR.findByEmailAndPassword(email, password);
+        Optional<Customer> customerOpt = customerR.findByEmailAndPassword(email, password);
+        Optional<Orders> orderOpt = ordersR.findById(orderId);
+        if(chefOpt.isPresent())
+        {
+            if(orderOpt.isPresent())
+            {
+                ordersR.deleteById(orderId);
+                return "Order completed";
+            } else {
+                return "Order not found";
+            }
+        } else if (customerOpt.isPresent())
+        {
+            if(orderOpt.isPresent())
+            {
+                ordersR.deleteById(orderId);
+                return "Order canceled";
+            } else {
+                return "Order not found";
+            }
+        } else {
+            return "Wrong email or password";
+        }
+    }
+
     // get list of customers
     @GetMapping(value="/customers")
     public List<Customer> getCustomers() {
@@ -78,6 +108,25 @@ public class ApiControllers {
     public String saveUser(@RequestBody Customer Customers){
         customerR.save(Customers);
         return "user registered";
+    }
+
+    // create new order with customer's login data
+    @PostMapping(value="/order")
+    public String saveOrder(@RequestBody Orders order, @RequestParam String email, @RequestParam String password){
+        Optional<Dishes> dishOpt = dishesR.findById(order.getDishId());
+        Optional<Customer> customerOpt = customerR.findByEmailAndPassword(email, password);
+        if(customerOpt.isEmpty()){
+            return "Wrong email or password";
+        } else if (dishOpt.isEmpty()) {
+            return "Dish with chosen id doesn't exist";
+        }
+
+        Customer customer = customerOpt.get();
+        long userId = customer.getUserId();
+
+        order.setUserId(userId);
+        ordersR.save(order);
+        return "Order created successfully";
     }
 
 }
