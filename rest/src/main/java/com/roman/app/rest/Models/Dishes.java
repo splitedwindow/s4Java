@@ -21,5 +21,4 @@ public class Dishes {
 
     @Column
     private String name;
-
 }

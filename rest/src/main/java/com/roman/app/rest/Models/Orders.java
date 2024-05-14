@@ -10,7 +10,6 @@ public class Orders {
     @GeneratedValue
     private long orderId;
 
-
     public int getName() {
         return dishId;
     }
