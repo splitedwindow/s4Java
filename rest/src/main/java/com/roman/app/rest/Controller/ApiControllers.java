@@ -3,10 +3,8 @@ package com.roman.app.rest.Controller;
 import com.roman.app.rest.Models.Chef;
 import com.roman.app.rest.Models.Customer;
 import com.roman.app.rest.Models.Dishes;
-import com.roman.app.rest.Repo.ChefRepo;
-import com.roman.app.rest.Repo.customerRepo;
-import com.roman.app.rest.Repo.dishesRepo;
-import com.roman.app.rest.Repo.ordersRepo;
+import com.roman.app.rest.Models.chef_pass;
+import com.roman.app.rest.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +22,8 @@ public class ApiControllers {
     private dishesRepo dishesR;
     @Autowired
     private ordersRepo orderR;
+    @Autowired
+    private chef_passRepo chef_passR;
 
     @GetMapping(value = "/")
     public String getPage() {
@@ -56,9 +56,15 @@ public class ApiControllers {
 
     // create new chef
     @PostMapping(value="/chefregister")
-    public String saveChef(@RequestBody Chef chef){
-        chefR.save(chef);
-        return "chef registered";
+    public String saveChef(@RequestBody Chef chef, @RequestParam String password){
+        Optional<chef_pass> chef_passOptional = chef_passR.findByPassword(password);
+        if(chef_passOptional.isEmpty())
+        {
+            return "Chef passcode for registration is required";
+        } else {
+            chefR.save(chef);
+            return "chef registered";
+        }
     }
 
     // get list of customers
@@ -73,7 +79,6 @@ public class ApiControllers {
         customerR.save(Customers);
         return "user registered";
     }
-
 
 }
 
