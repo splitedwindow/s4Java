@@ -21,9 +21,8 @@ public class securityConfig {
                         .requestMatchers("/", "/customers", "/chefregister", "/register").permitAll() // Allow public access to specific endpoints
                         .requestMatchers("/orders", "/dishes").hasRole("CUSTOMER")
                         .requestMatchers("/dish", "/dishes").hasRole("CHEF")
-                        .anyRequest().authenticated() // Secure other endpoints
-                )
-                .formLogin(login -> login.loginPage("/").permitAll());
+                        .anyRequest().authenticated()
+                );
         // Enable HTTP Basic authentication
         return http.build();
     }
