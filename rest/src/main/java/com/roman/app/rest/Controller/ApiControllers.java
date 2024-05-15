@@ -3,6 +3,8 @@ package com.roman.app.rest.Controller;
 import com.roman.app.rest.Models.*;
 import com.roman.app.rest.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,23 +29,19 @@ public class ApiControllers {
         return "Welcome";
     }
 
-    // get all the chefs
-    @GetMapping(value="/chefs")
-    public List<сhef> getChefs() {
+    @GetMapping(value = "/chefs")
+    public List<chef> getChefs() {
         return chefR.findAll();
     }
 
-
-    // get all the dishes
-    @GetMapping(value="/dishes")
+    @GetMapping(value = "/dishes")
     public List<dishes> getDishes() {
         return dishesR.findAll();
     }
 
-//    crete new dish
     @PostMapping(value = "/dish")
-    public String saveDish(@RequestBody dishes dish, @RequestParam String email, @RequestParam String password){
-        Optional<сhef> chefOpt = chefR.findByEmailAndPassword(email, password);
+    public String saveDish(@RequestBody dishes dish, @AuthenticationPrincipal User user) {
+        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
         if (chefOpt.isEmpty()) {
             return "Chef not found";
         }
@@ -51,12 +49,10 @@ public class ApiControllers {
         return "Dish created";
     }
 
-    // create new chef
-    @PostMapping(value="/chefregister")
-    public String saveChef(@RequestBody сhef chef, @RequestParam String password){
+    @PostMapping(value = "/chefregister")
+    public String saveChef(@AuthenticationPrincipal chef chef, @RequestParam String password) {
         Optional<chef_pass> chef_passOptional = chef_passR.findByPassword(password);
-        if(chef_passOptional.isEmpty())
-        {
+        if (chef_passOptional.isEmpty()) {
             return "Chef passcode for registration is required";
         } else {
             chefR.save(chef);
@@ -64,38 +60,31 @@ public class ApiControllers {
         }
     }
 
-    @GetMapping(value="/orders")
+    @GetMapping(value = "/orders")
     public List<orders> getOrders() {
         return ordersR.findAll();
     }
 
     @DeleteMapping("/order/delete/{orderId}")
-    public String DeleteOrder(@PathVariable Long orderId, @RequestParam String password, @RequestParam String email) {
-        Optional<сhef> chefOpt = chefR.findByEmailAndPassword(email, password);
-        Optional<customer> customerOpt = customerR.findByEmailAndPassword(email, password);
+    public String DeleteOrder(@PathVariable Long orderId, @AuthenticationPrincipal User user) {
+        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
+        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
         Optional<orders> orderOpt = ordersR.findById(orderId);
-        if(chefOpt.isPresent())
-        {
-            if(orderOpt.isPresent())
-            {
+        if (chefOpt.isPresent()) {
+            if (orderOpt.isPresent()) {
                 ordersR.deleteById(orderId);
                 return "Order completed";
             } else {
                 return "Order not found";
             }
-        } else if (customerOpt.isPresent())
-        {
-
-            // chef if it's order of current user
-            if(orderOpt.isPresent())
-            {
+        } else if (customerOpt.isPresent()) {
+            if (orderOpt.isPresent()) {
                 customer customer = customerOpt.get();
                 long userId = customer.getUserId();
                 orders order = orderOpt.get();
                 long orderUserId = order.getUserId();
 
-                if(userId != orderUserId)
-                {
+                if (userId != orderUserId) {
                     return "It's order of different user.";
                 }
 
@@ -105,30 +94,27 @@ public class ApiControllers {
                 return "Order not found";
             }
         } else {
-            return "Wrong email or password";
+            return "Unauthorized";
         }
     }
 
-    // get list of customers
-    @GetMapping(value="/customers")
+    @GetMapping(value = "/customers")
     public List<customer> getCustomers() {
         return customerR.findAll();
     }
 
-    // create new customer
-    @PostMapping(value="/register")
-    public String saveUser(@RequestBody customer Customers){
+    @PostMapping(value = "/register")
+    public String saveUser(@RequestBody customer Customers) {
         customerR.save(Customers);
         return "user registered";
     }
 
-    // create new order with customer's login data
-    @PostMapping(value="/order")
-    public String saveOrder(@RequestBody orders order, @RequestParam String email, @RequestParam String password){
+    @PostMapping(value = "/order")
+    public String saveOrder(@RequestBody orders order, @AuthenticationPrincipal User user) {
         Optional<dishes> dishOpt = dishesR.findById(order.getDishId());
-        Optional<customer> customerOpt = customerR.findByEmailAndPassword(email, password);
-        if(customerOpt.isEmpty()){
-            return "Wrong email or password";
+        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
+        if (customerOpt.isEmpty()) {
+            return "Unauthorized";
         } else if (dishOpt.isEmpty()) {
             return "Dish with chosen id doesn't exist";
         }
@@ -140,6 +126,4 @@ public class ApiControllers {
         ordersR.save(order);
         return "Order created successfully";
     }
-
 }
-

@@ -3,7 +3,7 @@ package com.roman.app.rest.Models;
 import jakarta.persistence.*;
 
 @Entity
-public class сhef {
+public class chef {
     @Id
     @GeneratedValue
     private long chefId;
