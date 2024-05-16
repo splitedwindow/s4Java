@@ -9,6 +9,15 @@ public class dishes {
     @GeneratedValue
     private long dishId;
 
+    public dishes(long dishId, String name) {
+        this.dishId = dishId;
+        this.name = name;
+    }
+
+    public dishes() {
+
+    }
+
     public String getName() {
         return name;
     }

@@ -43,6 +43,7 @@ public class securityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/access/denied").denyAll() // for test
                         .requestMatchers(("/**")).permitAll()
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/customer/**", "/order/**").hasRole("CUSTOMER")

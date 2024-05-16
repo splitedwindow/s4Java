@@ -4,6 +4,15 @@ import jakarta.persistence.*;
 
 @Entity
 public class user {
+    public user(String email, String password, String role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public user() {
+    }
+
     public long getUserId() {
         return userId;
     }

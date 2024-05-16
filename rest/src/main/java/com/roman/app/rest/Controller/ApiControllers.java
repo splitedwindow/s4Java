@@ -28,9 +28,9 @@ public class ApiControllers {
         return "Welcome";
     }
 
-    @GetMapping(value = "/user")
-    public String getUserPage() {
-        return "Welcome, user";
+    @GetMapping(value = "/customer")
+    public String getCustomerPage() {
+        return "Welcome, customer";
     }
 
     @GetMapping(value = "/users")
