@@ -41,7 +41,7 @@ public class securityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/register", "/users").permitAll()
-                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/chef/**").hasRole("CHEF")
                         .anyRequest().denyAll()
                 )

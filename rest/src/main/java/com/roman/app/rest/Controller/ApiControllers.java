@@ -40,12 +40,8 @@ public class ApiControllers {
 
     @PostMapping(value = "/register")
     public String saveUser(@RequestBody user User, @RequestParam String role) {
-        Optional<roles> roleOpt = rolesR.findByRole(role);
-
-        if(roleOpt.isPresent())
+        if(role.equals("CUSTOMER") || role.equals("CHEF"))
         {
-            long currentRoleId = roleOpt.get().getRoleId();
-
             if(User.getEmail().isBlank())
             {
                 return "email hasn't been entered";
@@ -53,8 +49,7 @@ public class ApiControllers {
                 return "password hasn't been entered";
             }
 
-            User.setRoleId(currentRoleId);
-
+            User.setRole(role);
             PasswordEncoder encoder = new BCryptPasswordEncoder();
 
             String password = User.getPassword();

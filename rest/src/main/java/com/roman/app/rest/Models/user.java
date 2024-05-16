@@ -11,16 +11,17 @@ public class user {
     public void setUserId(long userId) {
         this.userId = userId;
     }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @Column(nullable = false)
-    private long roleId;
-
-    public long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(long roleId) {
-        this.roleId = roleId;
-    }
+    private String role;
 
     @Id
     @GeneratedValue
