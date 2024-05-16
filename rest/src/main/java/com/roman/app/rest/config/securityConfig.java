@@ -8,9 +8,12 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -40,9 +43,10 @@ public class securityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/register", "/users").permitAll()
-                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                        .requestMatchers("/chef/**").hasRole("CHEF")
+                        .requestMatchers(("/**")).permitAll()
+                        .requestMatchers("/register").permitAll()
+                        .requestMatchers("/customer/**", "/order/**").hasRole("CUSTOMER")
+                        .requestMatchers("/chef/**", "/order/**").hasRole("CHEF")
                         .anyRequest().denyAll()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

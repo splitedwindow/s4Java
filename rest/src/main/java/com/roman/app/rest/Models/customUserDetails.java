@@ -5,14 +5,16 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.mysql.cj.conf.PropertyKey.logger;
 
 public class customUserDetails implements UserDetails {
 
+    private static final Logger logger = LoggerFactory.getLogger(customUserDetails.class);
     private user User;
 
     public customUserDetails(user User) {
@@ -22,7 +24,8 @@ public class customUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE" + User.getRole());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(User.getRole());
+        logger.info("User authorities: {}", authority);
         return Set.of(authority);
     }
 
