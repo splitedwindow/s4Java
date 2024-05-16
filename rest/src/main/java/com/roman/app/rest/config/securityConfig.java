@@ -1,11 +1,10 @@
 package com.roman.app.rest.config;
 
-import com.roman.app.rest.Models.customCustomerDetailsService;
+import com.roman.app.rest.Models.customUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,15 +23,15 @@ public class securityConfig {
     }
 
     @Bean
-    UserDetailsService customerDetailsService() {
-        return new customCustomerDetailsService();
+    UserDetailsService userDetailsService() {
+        return new customUserDetailsService();
     }
 
     @Bean
     DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setUserDetailsService((customerDetailsService()));
+        authProvider.setUserDetailsService((userDetailsService()));
 
         return authProvider;
     }
@@ -41,10 +40,10 @@ public class securityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/register", "/chefregister").permitAll()
-                        .requestMatchers("/customer/**").authenticated()
+                        .requestMatchers("/register", "/users").permitAll()
+                        .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/chef/**").hasRole("CHEF")
-                        .anyRequest().authenticated()
+                        .anyRequest().denyAll()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())

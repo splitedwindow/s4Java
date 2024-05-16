@@ -3,7 +3,6 @@ package com.roman.app.rest.Models;
 import jakarta.persistence.*;
 import org.springframework.stereotype.Component;
 
-@Component
 @Entity
 public class dishes {
     @Id

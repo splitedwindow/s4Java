@@ -3,13 +3,23 @@ package com.roman.app.rest.Models;
 import jakarta.persistence.*;
 
 @Entity
-public class customer {
+public class user {
     public long getUserId() {
         return userId;
     }
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+    @Column(nullable = false)
+    private long roleId;
+
+    public long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(long roleId) {
+        this.roleId = roleId;
     }
 
     @Id

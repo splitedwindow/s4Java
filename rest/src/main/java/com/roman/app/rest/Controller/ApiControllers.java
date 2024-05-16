@@ -1,11 +1,9 @@
 package com.roman.app.rest.Controller;
 
-import com.roman.app.rest.Models.*;
+import com.roman.app.rest.Models.roles;
+import com.roman.app.rest.Models.user;
 import com.roman.app.rest.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -13,62 +11,111 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
-
 @RestController
 public class ApiControllers {
 
     @Autowired
-    private chefRepo chefR;
-    @Autowired
-    private customerRepo customerR;
+    private userRepo userR;
     @Autowired
     private dishesRepo dishesR;
     @Autowired
     private ordersRepo ordersR;
     @Autowired
-    private chef_passRepo chef_passR;
+    private rolesRepo rolesR;
 
     @GetMapping(value = "/")
     public String getPage() {
         return "Welcome";
     }
 
-    @GetMapping(value = "/chefs")
-    public List<chef> getChefs() {
-        return chefR.findAll();
+    @GetMapping(value = "/user")
+    public String getUserPage() {
+        return "Welcome, user";
     }
 
-    @GetMapping(value = "/dishes")
-    public List<dishes> getDishes() {
-        return dishesR.findAll();
+    @GetMapping(value = "/users")
+    public List<user> getUsers() {
+        return userR.findAll();
     }
 
-    @PostMapping(value = "/dish")
-    public String saveDish(@RequestBody dishes dish, @AuthenticationPrincipal User user) {
-        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
-        if (chefOpt.isEmpty()) {
-            return "Chef not found";
-        }
-        dishesR.save(dish);
-        return "Dish created";
-    }
+    @PostMapping(value = "/register")
+    public String saveUser(@RequestBody user User, @RequestParam String role) {
+        Optional<roles> roleOpt = rolesR.findByRole(role);
 
-    @PostMapping(value = "/chefregister")
-    public String saveChef(@AuthenticationPrincipal chef chef, @RequestParam String password) {
-        Optional<chef_pass> chef_passOptional = chef_passR.findByPassword(password);
-        if (chef_passOptional.isEmpty()) {
-            return "Chef passcode for registration is required";
+        if(roleOpt.isPresent())
+        {
+            long currentRoleId = roleOpt.get().getRoleId();
+
+            if(User.getEmail().isBlank())
+            {
+                return "email hasn't been entered";
+            } else if (User.getPassword().isBlank()) {
+                return "password hasn't been entered";
+            }
+
+            User.setRoleId(currentRoleId);
+
+            PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            String password = User.getPassword();
+            String encodedPassword = encoder.encode(password);
+            User.setPassword(encodedPassword);
+
+            userR.save(User);
+            return "user saved";
         } else {
-            chefR.save(chef);
-            return "chef registered";
+            return "role not set";
         }
     }
 
-    @GetMapping(value = "/orders")
-    public List<orders> getOrders() {
-        return ordersR.findAll();
-    }
+//    @PostMapping(value = "/register")
+//    public String saveUser(@RequestBody customer Customer) {
+//        PasswordEncoder encoder = new BCryptPasswordEncoder();
+//
+//        String password = Customer.getPassword();
+//        String encodedPassword = encoder.encode(password);
+//        Customer.setPassword(encodedPassword);
+//
+//        customerR.save(Customer);
+//        return "user registered";
+//    }
+
+//
+//    @GetMapping(value = "/chefs")
+//    public List<chef> getChefs() {
+//        return chefR.findAll();
+//    }
+//
+//    @GetMapping(value = "/dishes")
+//    public List<dishes> getDishes() {
+//        return dishesR.findAll();
+//    }
+//
+//    @PostMapping(value = "/dish")
+//    public String saveDish(@RequestBody dishes dish, @AuthenticationPrincipal User user) {
+//        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
+//        if (chefOpt.isEmpty()) {
+//            return "Chef not found";
+//        }
+//        dishesR.save(dish);
+//        return "Dish created";
+//    }
+//
+//    @PostMapping(value = "/chefregister")
+//    public String saveChef(@AuthenticationPrincipal chef chef, @RequestParam String password) {
+//        Optional<chef_pass> chef_passOptional = chef_passR.findByPassword(password);
+//        if (chef_passOptional.isEmpty()) {
+//            return "Chef passcode for registration is required";
+//        } else {
+//            chefR.save(chef);
+//            return "chef registered";
+//        }
+//    }
+//
+//    @GetMapping(value = "/orders")
+//    public List<orders> getOrders() {
+//        return ordersR.findAll();
+//    }
 
 //    @DeleteMapping("/order/delete/{orderId}")
 //    public String DeleteOrder(@PathVariable Long orderId, @AuthenticationPrincipal User user) {
@@ -103,22 +150,12 @@ public class ApiControllers {
 //        }
 //    }
 
-    @GetMapping(value = "/customers")
-    public List<customer> getCustomers() {
-        return customerR.findAll();
-    }
+//    @GetMapping(value = "/customers")
+//    public List<customer> getCustomers() {
+//        return customerR.findAll();
+//    }
+//
 
-    @PostMapping(value = "/register")
-    public String saveUser(@RequestBody customer Customer) {
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        String password = Customer.getPassword();
-        String encodedPassword = encoder.encode(password);
-        Customer.setPassword(encodedPassword);
-
-        customerR.save(Customer);
-        return "user registered";
-    }
 
 //    @PostMapping(value = "/order")
 //    public String saveOrder(@RequestBody orders order, @AuthenticationPrincipal User user) {

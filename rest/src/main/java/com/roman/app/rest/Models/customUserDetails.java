@@ -1,32 +1,38 @@
 package com.roman.app.rest.Models;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class customCustomerDetails implements UserDetails {
+public class customUserDetails implements UserDetails {
 
-    private customer Customer;
+    private user User;
+    private List <roles> Roles;
 
-    public customCustomerDetails(customer Customer) {
+    public customUserDetails(user User) {
         super();
-        this.Customer = Customer;
+        this.User = User;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRole()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public String getPassword() {
-        return Customer.getPassword();
+        return User.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return Customer.getEmail();
+        return User.getEmail();
     }
 
     @Override
