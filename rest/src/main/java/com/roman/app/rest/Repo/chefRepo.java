@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ChefRepo extends JpaRepository<chef, Long> {
-    Optional<chef> findByEmail(String email); // Add this method
+public interface chefRepo extends JpaRepository<chef, Long> {
+    Optional<chef> findByEmail(String email);
     Optional<chef> findByEmailAndPassword(String email, String password);
+
 }

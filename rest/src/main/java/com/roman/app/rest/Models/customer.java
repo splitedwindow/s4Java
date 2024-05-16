@@ -1,9 +1,7 @@
 package com.roman.app.rest.Models;
 
 import jakarta.persistence.*;
-import org.springframework.stereotype.Component;
 
-@Component
 @Entity
 public class customer {
     public long getUserId() {
@@ -33,8 +31,8 @@ public class customer {
         this.password = password;
     }
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String email;
-    @Column
+    @Column(nullable = false)
     private String password;
 }

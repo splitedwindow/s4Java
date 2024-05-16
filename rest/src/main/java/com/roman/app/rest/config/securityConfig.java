@@ -1,12 +1,15 @@
 package com.roman.app.rest.config;
 
+import com.roman.app.rest.Models.customCustomerDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configurers.userdetails.DaoAuthenticationConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,34 +19,39 @@ import org.springframework.security.web.SecurityFilterChain;
 public class securityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/", "/customers", "/chefregister", "/register").permitAll() // Allow public access to specific endpoints
-                        .requestMatchers("/orders", "/dishes").hasRole("CUSTOMER")
-                        .requestMatchers("/dish", "/dishes").hasRole("CHEF")
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    UserDetailsService customerDetailsService() {
+        return new customCustomerDetailsService();
+    }
+
+    @Bean
+    DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService((customerDetailsService()));
+
+        return authProvider;
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/register", "/chefregister").permitAll()
+                        .requestMatchers("/customer/**").authenticated()
+                        .requestMatchers("/chef/**").hasRole("CHEF")
                         .anyRequest().authenticated()
-                );
-        // Enable HTTP Basic authentication
+                )
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable())
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withUsername("customer")
-                .password(passwordEncoder().encode("password"))
-                .roles("CUSTOMER")
-                .build());
-        manager.createUser(User.withUsername("chef")
-//                .password(passwordEncoder().encode("chef"))
-                .password("chef")
-                .roles("CHEF")
-                .build());
-        return manager;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }
+
+

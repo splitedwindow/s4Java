@@ -3,18 +3,23 @@ package com.roman.app.rest.Controller;
 import com.roman.app.rest.Models.*;
 import com.roman.app.rest.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
+
 @RestController
 public class ApiControllers {
 
     @Autowired
-    private ChefRepo chefR;
+    private chefRepo chefR;
     @Autowired
     private customerRepo customerR;
     @Autowired
@@ -65,38 +70,38 @@ public class ApiControllers {
         return ordersR.findAll();
     }
 
-    @DeleteMapping("/order/delete/{orderId}")
-    public String DeleteOrder(@PathVariable Long orderId, @AuthenticationPrincipal User user) {
-        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
-        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
-        Optional<orders> orderOpt = ordersR.findById(orderId);
-        if (chefOpt.isPresent()) {
-            if (orderOpt.isPresent()) {
-                ordersR.deleteById(orderId);
-                return "Order completed";
-            } else {
-                return "Order not found";
-            }
-        } else if (customerOpt.isPresent()) {
-            if (orderOpt.isPresent()) {
-                customer customer = customerOpt.get();
-                long userId = customer.getUserId();
-                orders order = orderOpt.get();
-                long orderUserId = order.getUserId();
-
-                if (userId != orderUserId) {
-                    return "It's order of different user.";
-                }
-
-                ordersR.deleteById(orderId);
-                return "Order canceled";
-            } else {
-                return "Order not found";
-            }
-        } else {
-            return "Unauthorized";
-        }
-    }
+//    @DeleteMapping("/order/delete/{orderId}")
+//    public String DeleteOrder(@PathVariable Long orderId, @AuthenticationPrincipal User user) {
+//        Optional<chef> chefOpt = chefR.findByEmail(user.getUsername());
+//        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
+//        Optional<orders> orderOpt = ordersR.findById(orderId);
+//        if (chefOpt.isPresent()) {
+//            if (orderOpt.isPresent()) {
+//                ordersR.deleteById(orderId);
+//                return "Order completed";
+//            } else {
+//                return "Order not found";
+//            }
+//        } else if (customerOpt.isPresent()) {
+//            if (orderOpt.isPresent()) {
+//                customer customer = customerOpt.get();
+//                long userId = customer.getUserId();
+//                orders order = orderOpt.get();
+//                long orderUserId = order.getUserId();
+//
+//                if (userId != orderUserId) {
+//                    return "It's order of different user.";
+//                }
+//
+//                ordersR.deleteById(orderId);
+//                return "Order canceled";
+//            } else {
+//                return "Order not found";
+//            }
+//        } else {
+//            return "Unauthorized";
+//        }
+//    }
 
     @GetMapping(value = "/customers")
     public List<customer> getCustomers() {
@@ -104,26 +109,35 @@ public class ApiControllers {
     }
 
     @PostMapping(value = "/register")
-    public String saveUser(@RequestBody customer Customers) {
-        customerR.save(Customers);
+    public String saveUser(@RequestBody customer Customer) {
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        String password = Customer.getPassword();
+        String encodedPassword = encoder.encode(password);
+        Customer.setPassword(encodedPassword);
+
+        customerR.save(Customer);
         return "user registered";
     }
 
-    @PostMapping(value = "/order")
-    public String saveOrder(@RequestBody orders order, @AuthenticationPrincipal User user) {
-        Optional<dishes> dishOpt = dishesR.findById(order.getDishId());
-        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
-        if (customerOpt.isEmpty()) {
-            return "Unauthorized";
-        } else if (dishOpt.isEmpty()) {
-            return "Dish with chosen id doesn't exist";
-        }
+//    @PostMapping(value = "/order")
+//    public String saveOrder(@RequestBody orders order, @AuthenticationPrincipal User user) {
+//        Optional<dishes> dishOpt = dishesR.findById(order.getDishId());
+//        Optional<customer> customerOpt = customerR.findByEmail(user.getUsername());
+//        if (customerOpt.isEmpty()) {
+//            return "Unauthorized";
+//        } else if (dishOpt.isEmpty()) {
+//            return "Dish with chosen id doesn't exist";
+//        }
+//
+//        customer customer = customerOpt.get();
+//        long userId = customer.getUserId();
+//
+//        order.setUserId(userId);
+//        ordersR.save(order);
+//        return "Order created successfully";
+//    }
 
-        customer customer = customerOpt.get();
-        long userId = customer.getUserId();
+    // new try
 
-        order.setUserId(userId);
-        ordersR.save(order);
-        return "Order created successfully";
-    }
 }

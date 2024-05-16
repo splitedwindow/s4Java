@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface customerRepo extends JpaRepository<customer, Long> {
-    Optional<customer> findByEmail(String email); // Add this method
+//    Optional<customer> findByEmail(String email);
     Optional<customer> findByEmailAndPassword(String email, String password);
+
+    public customer findByEmail(String email);
 }
